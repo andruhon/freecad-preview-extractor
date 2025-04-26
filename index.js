@@ -1,3 +1,3 @@
 #!/usr/bin/env node
-console.log('extract!!!');
-await import("./from-claude.js");
+console.log('Extracting images from FreeCAD files.');
+await import("./extract-png-from-fcstd.js");

@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import yauzl from 'yauzl';
 import { glob } from 'glob';
-import { execSync } from 'child_process';
 
 // Helper to promisify yauzl's zip opening
 function openZipPromise(filename) {
@@ -14,17 +13,18 @@ function openZipPromise(filename) {
   });
 }
 
-// Helper to read a specific file from a zip archive
-async function extractPngFromZip(zipFilePath, outputPath) {
+// Helper to extract specifically thumbnails/Thumbnail.png from a zip archive
+async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
   const zipfile = await openZipPromise(zipFilePath);
-  let foundPng = false;
+  const targetFile = 'thumbnails/Thumbnail.png';
+  let foundThumbnail = false;
   
   return new Promise((resolve, reject) => {
     zipfile.on('entry', (entry) => {
-      // Look for PNG files in the zip
-      if (entry.fileName.toLowerCase().endsWith('.png')) {
-        console.log(`✅ Found PNG in ${path.basename(zipFilePath)}: ${entry.fileName}`);
-        foundPng = true;
+      // Look specifically for thumbnails/Thumbnail.png
+      if (entry.fileName === targetFile) {
+        console.log(`✅ Found Thumbnail in ${path.basename(zipFilePath)}`);
+        foundThumbnail = true;
         
         zipfile.openReadStream(entry, (err, readStream) => {
           if (err) {
@@ -32,12 +32,19 @@ async function extractPngFromZip(zipFilePath, outputPath) {
             return reject(err);
           }
           
+          // Create directory if it doesn't exist
+          const outputDir = path.dirname(outputPath);
+          if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+          }
+          
           const writeStream = fs.createWriteStream(outputPath);
           readStream.pipe(writeStream);
           
-          writeStream.on('close', () => {
-            console.log(`✅ Extracted to: ${outputPath}`);
-            zipfile.readEntry();
+          writeStream.on('finish', () => {
+            console.log(`✅ Extracted thumbnail to: ${outputPath}`);
+            zipfile.close();
+            resolve(true);
           });
           
           writeStream.on('error', (err) => {
@@ -51,10 +58,10 @@ async function extractPngFromZip(zipFilePath, outputPath) {
     });
     
     zipfile.on('end', () => {
-      if (!foundPng) {
-        console.log(`⚠️ No PNG files found in ${path.basename(zipFilePath)}`);
+      if (!foundThumbnail) {
+        console.log(`⚠️ No thumbnail found in ${path.basename(zipFilePath)}`);
+        resolve(false);
       }
-      resolve(foundPng);
     });
     
     zipfile.on('error', (err) => {
@@ -68,31 +75,32 @@ async function extractPngFromZip(zipFilePath, outputPath) {
 // Main function
 async function main() {
   try {
-    // Find all .fcstd files in the current directory and subdirectories
-    const fcstdFiles = await glob('**/*.FCStd'); // FIXME this is case sensitive!
+    // Find all .FCStd files in the current directory and subdirectories (case insensitive)
+    const fcstdFiles = await glob('**/*.FCStd', { nocase: true });
     
     if (fcstdFiles.length === 0) {
-      console.log('❌ No .fcstd files found');
+      console.log('❌ No .FCStd files found');
       return;
     }
     
-    console.log(`✅ Found ${fcstdFiles.length} .fcstd files to check`);
+    console.log(`✅ Found ${fcstdFiles.length} .FCStd files to check`);
     
     for (const file of fcstdFiles) {
       try {
         // Prepare output path - same directory, same name but with .png extension
         const dir = path.dirname(file);
-        const baseName = path.basename(file, '.fcstd');
-        const pngPath = path.join(dir, `${baseName}.png`);
+        const baseName = path.basename(file, path.extname(file));
+        const pngPath = path.join(dir, `${baseName}-preview.png`);
         
-        // Try to extract PNG from the file treating it as a ZIP
-        await extractPngFromZip(file, pngPath);
+        // Try to extract thumbnail from the file
+        await extractThumbnailFromFCStd(file, pngPath);
         
       } catch (err) {
         console.log(`❌ Error processing ${file}: ${err.message}`);
       }
     }
     
+    console.log('✅ Processing complete');
   } catch (err) {
     console.error('❌ Error:', err);
   }
