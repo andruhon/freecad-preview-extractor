@@ -1,2 +1,5 @@
 /node_modules
 .gsloth.config.js
+/sloth-DIFF-review*
+/sloth-PR-review*
+/sloth-ASK*
