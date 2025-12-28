@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+
+# Macro Begin: isofit.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
+import FreeCAD
+
+view = Gui.activeDocument().activeView()
+view.setAnimationEnabled(False)
+view.viewIsometric()
+Gui.SendMsgToActiveView("ViewFit")
+Gui.updateGui()
+Gui.SendMsgToActiveView("Save")
+Gui.getMainWindow().close()
+
+# Macro End: isofit.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++

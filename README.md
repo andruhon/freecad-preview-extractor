@@ -1,4 +1,4 @@
-# FreeCAD preview extractor
+file:///home/parents/Documents/freecad-preview-extractor/isofit.FCMacro# FreeCAD preview extractor
 
 A little script extracting previews from all FreeCAD files in current directory recursively.
 
