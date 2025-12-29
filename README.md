@@ -1,11 +1,13 @@
-file:///home/parents/Documents/freecad-preview-extractor/isofit.FCMacro# FreeCAD preview extractor
+# FreeCAD preview extractor
 
-A little script extracting previews from all FreeCAD files in current directory recursively.
+A CLI tool for extracting and generating preview thumbnails from FreeCAD files.
 
-This is just a rough implementation with NodeJS, which extracts existing preview images.
+## Features
 
-The same thing should be achievable with FreeCAD python script in a better way:  
-Idealy model should be switched to isometric view and then picture should be saved, maybe one day I will build this thing.
+- **Extract existing previews**: Quickly extract embedded thumbnail images from `.FCStd` files
+- **Generate new previews**: Use FreeCAD to create fresh previews with isometric view and fit-to-view
+- **Batch processing**: Process all FreeCAD files in a directory recursively
+- **Single file mode**: Extract or generate previews for specific files
 
 ## Installation
 ```bash
