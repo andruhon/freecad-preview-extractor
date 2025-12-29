@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import yauzl from 'yauzl';
-import { glob } from 'glob';
 
 // Helper to promisify yauzl's zip opening
 function openZipPromise(filename) {
@@ -14,7 +13,7 @@ function openZipPromise(filename) {
 }
 
 // Helper to extract specifically thumbnails/Thumbnail.png from a zip archive
-async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
+export async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
   const zipfile = await openZipPromise(zipFilePath);
   const targetFile = 'thumbnails/Thumbnail.png';
   let foundThumbnail = false;
@@ -72,41 +71,33 @@ async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
   });
 }
 
-// Main function
-async function main() {
+// Process a single .FCStd file
+export async function processSingleFile(filePath) {
   try {
-    // Find all .FCStd files in the current directory and subdirectories (case insensitive)
-    const fcstdFiles = await glob('**/*.FCStd', { nocase: true });
-    
-    if (fcstdFiles.length === 0) {
-      console.log('❌ No .FCStd files found');
-      return;
+    // Verify file exists
+    if (!fs.existsSync(filePath)) {
+      console.log(`❌ File not found: ${filePath}`);
+      return false;
     }
     
-    console.log(`✅ Found ${fcstdFiles.length} .FCStd files to check`);
-    
-    for (const file of fcstdFiles) {
-      try {
-        // Prepare output path - same directory, same name but with .png extension
-        const dir = path.dirname(file);
-        const baseName = path.basename(file, path.extname(file));
-        const pngPath = path.join(dir, `${baseName}-preview.png`);
-        
-        // Try to extract thumbnail from the file
-        await extractThumbnailFromFCStd(file, pngPath);
-        
-      } catch (err) {
-        console.log(`❌ Error processing ${file}: ${err.message}`);
-      }
+    // Verify it's a .FCStd file
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext !== '.fcstd') {
+      console.log(`❌ Not a .FCStd file: ${filePath}`);
+      return false;
     }
     
-    console.log('✅ Processing complete');
+    // Prepare output path - same directory, same name but with .png extension
+    const dir = path.dirname(filePath);
+    const baseName = path.basename(filePath, path.extname(filePath));
+    const pngPath = path.join(dir, `${baseName}-preview.png`);
+    
+    // Try to extract thumbnail from the file
+    await extractThumbnailFromFCStd(filePath, pngPath);
+    return true;
+    
   } catch (err) {
-    console.error('❌ Error:', err);
+    console.log(`❌ Error processing ${filePath}: ${err.message}`);
+    return false;
   }
 }
-
-// Run the script
-(async () => {
-  await main();
-})();
