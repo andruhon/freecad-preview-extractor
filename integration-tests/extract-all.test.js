@@ -1,13 +1,20 @@
-import { test, describe, before, after } from 'node:test';
-import { strict as assert } from 'node:assert';
-import { existsSync, statSync, writeFileSync, mkdirSync, rmSync, cpSync } from 'node:fs';
-import { spawn } from 'node:child_process';
+import {after, before, describe, test} from 'node:test';
+import {strict as assert} from 'node:assert';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  rmSync,
+  statSync,
+  writeFileSync
+} from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { 
-  cleanupPreviews, 
+import {fileURLToPath} from 'node:url';
+import {
+  cleanupPreviews,
+  getModelsDir,
   getPreviewPath,
-  getModelsDir
+  runCli
 } from './support/test-support.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -83,30 +90,8 @@ describe('Integration Tests - Extract All Functionality', () => {
     cleanupPreviews(outputs);
 
     // Run the extraction command on the test directory
-    const result = await new Promise((resolve, reject) => {
-      const child = spawn('npx', ['freecad-preview-extractor'], {
-        cwd: testDir,
-        stdio: 'pipe'
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      child.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      child.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      child.on('close', (code) => {
-        resolve({ code, stdout, stderr });
-      });
-
-      child.on('error', (err) => {
-        reject(err);
-      });
+    const result = await runCli([], {
+      cwd: testDir
     });
 
     // Check that the command succeeded
@@ -131,30 +116,8 @@ describe('Integration Tests - Extract All Functionality', () => {
     cleanupPreviews(outputs);
 
     // Run the extraction command
-    const result = await new Promise((resolve, reject) => {
-      const child = spawn('npx', ['freecad-preview-extractor'], {
-        cwd: testDir,
-        stdio: 'pipe'
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      child.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      child.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      child.on('close', (code) => {
-        resolve({ code, stdout, stderr });
-      });
-
-      child.on('error', (err) => {
-        reject(err);
-      });
+    const result = await runCli([], {
+      cwd: testDir
     });
 
     // Should successfully process files with different case extensions
@@ -176,30 +139,8 @@ describe('Integration Tests - Extract All Functionality', () => {
       mkdirSync(emptyDir, { recursive: true });
 
       // Run the extraction command on empty directory
-      const result = await new Promise((resolve, reject) => {
-        const child = spawn('npx', ['freecad-preview-extractor'], {
-          cwd: emptyDir,
-          stdio: 'pipe'
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        child.stdout.on('data', (data) => {
-          stdout += data.toString();
-        });
-
-        child.stderr.on('data', (data) => {
-          stderr += data.toString();
-        });
-
-        child.on('close', (code) => {
-          resolve({ code, stdout, stderr });
-        });
-
-        child.on('error', (err) => {
-          reject(err);
-        });
+      const result = await runCli([], {
+        cwd: emptyDir
       });
 
       // Should exit with error code when no files found
@@ -226,30 +167,8 @@ describe('Integration Tests - Extract All Functionality', () => {
       writeFileSync(path.join(nonFCStdDir, 'README.md'), '# Test');
 
       // Run the extraction command
-      const result = await new Promise((resolve, reject) => {
-        const child = spawn('npx', ['freecad-preview-extractor'], {
-          cwd: nonFCStdDir,
-          stdio: 'pipe'
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        child.stdout.on('data', (data) => {
-          stdout += data.toString();
-        });
-
-        child.stderr.on('data', (data) => {
-          stderr += data.toString();
-        });
-
-        child.on('close', (code) => {
-          resolve({ code, stdout, stderr });
-        });
-
-        child.on('error', (err) => {
-          reject(err);
-        });
+      const result = await runCli([], {
+        cwd: nonFCStdDir
       });
 
       // Should exit with error code when no FCStd files found
@@ -283,30 +202,8 @@ describe('Integration Tests - Extract All Functionality', () => {
       writeFileSync(invalidFile, Buffer.alloc(10));
 
       // Run the extraction command
-      const result = await new Promise((resolve, reject) => {
-        const child = spawn('npx', ['freecad-preview-extractor'], {
-          cwd: partialDir,
-          stdio: 'pipe'
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        child.stdout.on('data', (data) => {
-          stdout += data.toString();
-        });
-
-        child.stderr.on('data', (data) => {
-          stderr += data.toString();
-        });
-
-        child.on('close', (code) => {
-          resolve({ code, stdout, stderr });
-        });
-
-        child.on('error', (err) => {
-          reject(err);
-        });
+      const result = await runCli([], {
+        cwd: partialDir
       });
 
       // Should exit with error code due to partial failures
