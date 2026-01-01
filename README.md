@@ -1,5 +1,7 @@
 # FreeCAD preview extractor
 
+[![Tests and Lint](https://github.com/andruhon/freecad-preview-extractor/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/andruhon/freecad-preview-extractor/actions/workflows/unit-tests.yml) [![Integration Tests](https://github.com/andruhon/freecad-preview-extractor/actions/workflows/integration-tests.yml/badge.svg?event=push)](https://github.com/andruhon/freecad-preview-extractor/actions/workflows/integration-tests.yml)
+
 A CLI tool for extracting and generating preview thumbnails from FreeCAD files.
 
 Preview is extracted for each `FILENAME.FCStd` file as `FILENAME-preview.png`
