@@ -94,10 +94,32 @@ The `--ignore-config` option allows you to exclude specific files from batch pro
 
 ## Testing
 
+The project has comprehensive test suites covering unit logic and integration scenarios.
+
+### Unit Tests
+Run unit tests for core logic (path handling, ignore patterns, etc.):
 ```bash
-# Run unit tests
 npm test
 ```
+
+### Integration Tests
+Integration tests are split into two categories based on whether they require a local FreeCAD installation.
+
+**1. Standard Integration Tests (No FreeCAD required)**
+These tests check file extraction, CLI behavior, and ignore patterns without invoking FreeCAD.
+```bash
+npm run test:integration-no-freecad
+```
+
+**2. Full Integration Tests (FreeCAD required)**
+These tests involve the `--fit` flag and spawning the FreeCAD process. They require FreeCAD to be installed and available in the system PATH.
+```bash
+npm run test:integration
+```
+
+**Note for Developers:**
+- Tests ending in `.test.js` do not require FreeCAD.
+- Tests ending in `.test-freecad.js` require FreeCAD.
 
 ## Utilities
 
