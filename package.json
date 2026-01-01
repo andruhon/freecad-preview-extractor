@@ -15,7 +15,8 @@
   },
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/*.js",
-    "test:integration": "node --test --test-concurrency=1 integration-tests/*.js"
+    "test:integration": "node --test --test-concurrency=1 integration-tests/*.js",
+    "test:integration-no-freecad": "node --test --test-concurrency=1 integration-tests/*.test.js"
   },
   "engines": {
     "node": ">=24.0.0"
