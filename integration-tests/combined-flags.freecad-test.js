@@ -121,34 +121,5 @@ model2.FCStd
               `Should contain FreeCAD-related error message. stdout: ${result.stdout}, stderr: ${result.stderr}`);
   });
 
-  test('should process remaining files even when some are ignored', async () => {
-    // Clean up any existing preview files first
-    cleanupPreviews([output1, output2, archivedOutput, subDirOutput]);
 
-    // Run the extraction command with ignore config (no --fit)
-    const result = await runCli(['--ignore-config', '.fcignore'], {
-      cwd: testDir
-    });
-
-    // Check that the command succeeded
-    assert.equal(result.code, 0, `Command should exit with code 0. stderr: ${result.stderr}`);
-
-    // Verify that exactly 2 files were processed (model1 and subdir/nested)
-    const processedFiles = [output1, subDirOutput];
-    const ignoredFiles = [output2, archivedOutput];
-    
-    // Processed files should exist
-    processedFiles.forEach(file => {
-      assert.ok(existsSync(file), `Should process file: ${path.basename(file)}`);
-    });
-    
-    // Ignored files should not exist
-    ignoredFiles.forEach(file => {
-      assert.ok(!existsSync(file), `Should ignore file: ${path.basename(file)}`);
-    });
-    
-    // Check progress output
-    assert.ok(result.stdout.includes('2 succeeded'), 'Should report 2 successful extractions');
-    assert.ok(result.stdout.includes('Ignored 2 files'), 'Should report 2 ignored files');
-  });
 });

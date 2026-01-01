@@ -21,7 +21,11 @@
     },
     "integration_tests": {
       "command": "npm run test:integration",
-      "description": "Run integration tests."
+      "description": "Run integration tests (needs FreeCAD installation)."
+    },
+    "integration_tests_no_freecad": {
+      "command": "npm run test:integration-no-freecad",
+      "description": "Run integration tests which don't need FreeCAD installation."
     }
   }
 }
