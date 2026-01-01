@@ -18,6 +18,19 @@
     "test:integration": "node --test --test-concurrency=1 integration-tests/*.js",
     "test:integration-no-freecad": "node --test --test-concurrency=1 integration-tests/*.test.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andruhon/freecad-preview-extractor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andruhon/freecad-preview-extractor/issues"
+  },
+  "homepage": "https://github.com/andruhon/freecad-preview-extractor#readme",
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
   "engines": {
     "node": ">=24.0.0"
   },

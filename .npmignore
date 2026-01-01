@@ -1,0 +1,19 @@
+# Source control
+.git
+.gitignore
+.github
+.idea
+.gsloth
+
+# Tests
+integration-tests/
+tests/
+
+# Config files
+.gsloth.config.json
+.gsloth.guidelines.md
+AGENTS.md
+windows-failure.md
+
+# Dependencies
+node_modules/
