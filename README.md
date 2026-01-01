@@ -15,11 +15,17 @@ Preview is extracted for each `FILENAME.FCStd` file as `FILENAME-preview.png`
 - **Ignore patterns**: Use an ignore config file (like `.gitignore`) to exclude specific files from batch processing
 
 ## Installation
+
+Install globally:
+
 ```bash
-git clone https://github.com/andruhon/freecad-preview-extractor.git
-cd ./freecad-preview-extractor
-npm ci
-sudo npm install -g ./
+npm install -g freecad-preview-extractor
+```
+
+Or run directly with npx:
+
+```bash
+npx freecad-preview-extractor
 ```
 
 ## Usage
@@ -128,6 +134,17 @@ The project exports utility functions that can be used programmatically:
 - `loadIgnoreConfig(filePath, cwd)` - Load ignore patterns from a file
 - `filterIgnoredFiles(filePaths, rootDir, patterns, enabled)` - Filter files based on patterns
 - `shouldIgnoreFile(filePath, rootDir, patterns, enabled)` - Check if a single file should be ignored
+
+## Development
+
+To set up the project for development:
+
+```bash
+git clone https://github.com/andruhon/freecad-preview-extractor.git
+cd ./freecad-preview-extractor
+npm ci
+sudo npm install -g ./
+```
 
 ## Project Files
 
