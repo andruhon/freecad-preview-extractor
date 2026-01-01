@@ -14,8 +14,8 @@
     "freecad-preview-extractor": "src/index.js"
   },
   "scripts": {
-    "test": "node --test tests/*.js",
-    "test:integration": "node --test integration-tests/*.js"
+    "test": "node --test --test-concurrency=1 tests/*.js",
+    "test:integration": "node --test --test-concurrency=1 integration-tests/*.js"
   },
   "engines": {
     "node": ">=24.0.0"

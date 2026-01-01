@@ -1,29 +1,36 @@
 import { test, describe, before, after } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { existsSync, unlinkSync, statSync } from 'node:fs';
-import { spawn } from 'node:child_process';
+import { existsSync, statSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cleanupPreviews, getPreviewPath, copyModelsDirectory, runCli } from './support/test-support.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('Integration Tests - Basic Extraction', () => {
-  const testFile = path.join(__dirname, 'test-project', 'cube.FCStd');
-  const expectedOutput = path.join(__dirname, 'test-project', 'cube-preview.png');
+  const testDir = path.join(__dirname, 'test-basic-extract');
+  const testFile = path.join(testDir, 'cube.FCStd');
+  const expectedOutput = getPreviewPath(testFile);
 
-  // Clean up any existing preview file before tests
+  // Set up test environment before tests
   before(() => {
-    if (existsSync(expectedOutput)) {
-      unlinkSync(expectedOutput);
+    // Clean up any existing test directory
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true });
     }
+    
+    // Copy models directory for testing
+    copyModelsDirectory(testDir);
+    
+    // Clean up any existing preview files
+    cleanupPreviews([expectedOutput]);
   });
 
   // Clean up after tests
   after(() => {
-    if (existsSync(expectedOutput)) {
-      console.log(`Cleaning up ${expectedOutput}`);
-      unlinkSync(expectedOutput);
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true });
     }
   });
 
@@ -34,31 +41,7 @@ describe('Integration Tests - Basic Extraction', () => {
     }
 
     // Run the extraction command
-    const result = await new Promise((resolve, reject) => {
-      const child = spawn('npx', ['freecad-preview-extractor', testFile], {
-        cwd: path.join(__dirname, '..'),
-        stdio: 'pipe'
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      child.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      child.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      child.on('close', (code) => {
-        resolve({ code, stdout, stderr });
-      });
-
-      child.on('error', (err) => {
-        reject(err);
-      });
-    });
+    const result = await runCli([testFile]);
 
     // Check that the command succeeded
     assert.equal(result.code, 0, `Command should exit with code 0. stderr: ${result.stderr}`);

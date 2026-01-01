@@ -2,6 +2,8 @@
 
 A CLI tool for extracting and generating preview thumbnails from FreeCAD files.
 
+Preview is extracted for each `FILENAME.FCStd` file as `FILENAME-preview.png`
+
 ## Features
 
 - **Extract existing previews**: Quickly extract embedded thumbnail images from `.FCStd` files
