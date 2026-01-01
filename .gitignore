@@ -5,3 +5,4 @@
 gth_*.md
 *.FCBak
 scratchpad*
+tests/test-temp-*

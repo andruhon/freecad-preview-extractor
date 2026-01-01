@@ -1,6 +1,6 @@
 {
   "name": "freecad-preview-extractor",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha",
   "description": "Script extracting freecad previews",
   "keywords": [
     "FreeCAD"
@@ -8,17 +8,19 @@
   "license": "MIT",
   "author": "Andrew Kondratev",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "bin": {
-    "fcxtc": "index.js",
-    "freecad-preview-extractor": "index.js"
+    "fcxtc": "src/index.js",
+    "fqreecad-preview-extractor": "src/index.js"
   },
   "scripts": {
-    "test": "test"
+    "test": "node --test tests/*.js",
+    "test:integration": "node --test integration-tests/*.js"
   },
   "dependencies": {
     "glob": "^13.0.0",
     "mkdirp": "^3.0.1",
-    "yauzl": "^3.2.0"
+    "yauzl": "^3.2.0",
+    "minimatch": "^10.1.1"
   }
 }

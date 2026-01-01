@@ -1,0 +1,26 @@
+{
+  "llm": {
+    "type": "openrouter",
+    "model": "kwaipilot/kat-coder-pro:free"
+  },
+  "projectGuidelines": "AGENTS.md",
+  "commands": {
+    "code": {
+      "filesystem": "all",
+      "devTools": {
+        "run_tests": "npm test",
+        "run_single_test": "npm test -- ${testPath}"
+      }
+    }
+  },
+  "customTools": {
+    "git_diff": {
+      "command": "git --no-pager diff",
+      "description": "View current diff with `git --no-pager diff`"
+    },
+    "integration_tests": {
+      "command": "npm run test:integration",
+      "description": "Run integration tests."
+    }
+  }
+}

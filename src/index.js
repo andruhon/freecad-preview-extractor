@@ -7,9 +7,15 @@ import {
   processSingleFile,
   extractThumbnailFromFCStd,
 } from "./extract-png-from-fcstd.js";
+import { loadIgnoreConfig, filterIgnoredFiles } from "./ignore-utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Get root directory for pattern matching
+function getRootDir(cwd = process.cwd()) {
+  return cwd;
+}
 
 // Run FreeCAD with isofit macro to generate preview
 async function runFreeCADIsofit(fcstdFile) {
@@ -52,13 +58,33 @@ async function runFreeCADIsofit(fcstdFile) {
 }
 
 // Process all .FCStd files in current directory and subdirectories
-async function processAllFiles(runFit = false) {
+async function processAllFiles(runFit = false, ignoreConfig = null) {
   try {
     // Find all .FCStd files in the current directory and subdirectories (case insensitive)
-    const fcstdFiles = await glob("**/*.FCStd", { nocase: true });
+    let fcstdFiles = await glob("**/*.FCStd", { nocase: true });
 
     if (fcstdFiles.length === 0) {
       console.log("❌ No .FCStd files found");
+      return;
+    }
+
+    // Apply ignore patterns if config is provided
+    let ignorePatterns = [];
+    if (ignoreConfig) {
+      const rootDir = getRootDir();
+      ignorePatterns = loadIgnoreConfig(ignoreConfig, rootDir);
+      if (ignorePatterns.length > 0) {
+        const originalCount = fcstdFiles.length;
+        fcstdFiles = filterIgnoredFiles(fcstdFiles, rootDir, ignorePatterns, true);
+        const ignoredCount = originalCount - fcstdFiles.length;
+        if (ignoredCount > 0) {
+          console.log(`🔍 Ignored ${ignoredCount} files based on ${ignoreConfig}`);
+        }
+      }
+    }
+
+    if (fcstdFiles.length === 0) {
+      console.log("❌ All files were filtered out by ignore patterns");
       return;
     }
 
@@ -97,8 +123,19 @@ async function main() {
   const fitIndex = args.indexOf("--fit");
   const runFit = fitIndex !== -1;
 
-  // Remove --fit from args if present
-  const fileArgs = args.filter((arg) => arg !== "--fit");
+  // Check for --ignore-config flag
+  let ignoreConfig = null;
+  const ignoreConfigIndex = args.indexOf("--ignore-config");
+  if (ignoreConfigIndex !== -1 && ignoreConfigIndex + 1 < args.length) {
+    ignoreConfig = args[ignoreConfigIndex + 1];
+  }
+
+  // Filter out --fit, --ignore-config and its value to get file arguments
+  const flagsToExclude = new Set(["--fit", "--ignore-config"]);
+  if (ignoreConfig) {
+    flagsToExclude.add(ignoreConfig);
+  }
+  const fileArgs = args.filter((arg) => !flagsToExclude.has(arg));
 
   if (fileArgs.length === 0) {
     // No arguments - process all files
@@ -111,11 +148,15 @@ async function main() {
         "🔍 Extracting images from all FreeCAD files in current directory...",
       );
     }
-    await processAllFiles(runFit);
+    if (ignoreConfig) {
+      console.log(`🔍 Using ignore config: ${ignoreConfig}`);
+    }
+    await processAllFiles(runFit, ignoreConfig);
   } else {
     // Process specific file(s)
     const file = fileArgs[0];
 
+    // For single file mode, ignore config is not applied
     if (runFit) {
       console.log(`🔧 Running FreeCAD isofit on: ${file}`);
       await runFreeCADIsofit(file);
@@ -125,6 +166,9 @@ async function main() {
     await processSingleFile(file);
   }
 }
+
+export { processAllFiles, runFreeCADIsofit };
+export { loadIgnoreConfig, filterIgnoredFiles } from "./ignore-utils.js";
 
 // Run the script
 main().catch((err) => {
