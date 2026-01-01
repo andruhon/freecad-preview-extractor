@@ -2,8 +2,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import { minimatch } from 'minimatch';
 import path from 'node:path';
 
-const DEFAULT_IGNORE_FILE = '.aiignore';
-
 /**
  * Load ignore patterns from a file
  * @param {string} ignoreFilePath - Path to the ignore file

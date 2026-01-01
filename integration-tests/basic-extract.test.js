@@ -27,16 +27,15 @@ describe('Integration Tests - Basic Extraction', () => {
     }
   });
 
-  test('should extract preview from cube.FCStd using fqreecad-preview-extractor', async () => {
+  test('should extract preview from cube.FCStd using freecad-preview-extractor', async () => {
     // Skip test if test file doesn't exist
     if (!existsSync(testFile)) {
       throw new Error(`${testFile} does not exist.`);
-      return;
     }
 
     // Run the extraction command
     const result = await new Promise((resolve, reject) => {
-      const child = spawn('npx', ['fqreecad-preview-extractor', testFile], {
+      const child = spawn('npx', ['freecad-preview-extractor', testFile], {
         cwd: path.join(__dirname, '..'),
         stdio: 'pipe'
       });
