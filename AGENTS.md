@@ -10,7 +10,6 @@ This is a Node.js CLI tool that extracts preview thumbnails from FreeCAD (.FCStd
 - **Main Dependencies**:
   - `yauzl` - ZIP file parsing
   - `glob` - File pattern matching
-  - `mkdirp` - Directory creation utilities
 
 ## Code Style & Conventions
 

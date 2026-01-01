@@ -2,6 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import yauzl from 'yauzl';
 
+// Constants
+const THUMBNAIL_PATH = 'thumbnails/Thumbnail.png';
+
 // Helper to promisify yauzl's zip opening
 function openZipPromise(filename) {
   return new Promise((resolve, reject) => {
@@ -12,16 +15,20 @@ function openZipPromise(filename) {
   });
 }
 
-// Helper to extract specifically thumbnails/Thumbnail.png from a zip archive
+/**
+ * Extract thumbnail from a FreeCAD file
+ * @param {string} zipFilePath - Path to the .FCStd file
+ * @param {string} outputPath - Path where to save the extracted PNG
+ * @returns {Promise<boolean>} True if thumbnail was found and extracted
+ */
 export async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
   const zipfile = await openZipPromise(zipFilePath);
-  const targetFile = 'thumbnails/Thumbnail.png';
   let foundThumbnail = false;
   
   return new Promise((resolve, reject) => {
     zipfile.on('entry', (entry) => {
       // Look specifically for thumbnails/Thumbnail.png
-      if (entry.fileName === targetFile) {
+      if (entry.fileName === THUMBNAIL_PATH) {
         console.log(`✅ Found Thumbnail in ${path.basename(zipFilePath)}`);
         foundThumbnail = true;
         
@@ -39,6 +46,12 @@ export async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
           
           const writeStream = fs.createWriteStream(outputPath);
           readStream.pipe(writeStream);
+          
+          // Handle readStream errors to prevent resource leaks
+          readStream.on('error', (err) => {
+            zipfile.close();
+            reject(err);
+          });
           
           writeStream.on('finish', () => {
             console.log(`✅ Extracted thumbnail to: ${outputPath}`);
@@ -71,7 +84,11 @@ export async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
   });
 }
 
-// Process a single .FCStd file
+/**
+ * Process a single .FCStd file to extract its preview
+ * @param {string} filePath - Path to the .FCStd file
+ * @returns {Promise<boolean>} True if processing was successful
+ */
 export async function processSingleFile(filePath) {
   try {
     // Verify file exists
