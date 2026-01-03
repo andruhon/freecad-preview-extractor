@@ -87,9 +87,10 @@ export async function extractThumbnailFromFCStd(zipFilePath, outputPath) {
 /**
  * Process a single .FCStd file to extract its preview
  * @param {string} filePath - Path to the .FCStd file
+ * @param {string} [customOutputPath] - Optional custom path for the output PNG
  * @returns {Promise<boolean>} True if processing was successful
  */
-export async function processSingleFile(filePath) {
+export async function processSingleFile(filePath, customOutputPath = null) {
   try {
     // Verify file exists
     if (!fs.existsSync(filePath)) {
@@ -107,7 +108,7 @@ export async function processSingleFile(filePath) {
     // Prepare output path - same directory, same name but with .png extension
     const dir = path.dirname(filePath);
     const baseName = path.basename(filePath, path.extname(filePath));
-    const pngPath = path.join(dir, `${baseName}-preview.png`);
+    const pngPath = customOutputPath || path.join(dir, `${baseName}-preview.png`);
     
     // Try to extract thumbnail from the file
     await extractThumbnailFromFCStd(filePath, pngPath);

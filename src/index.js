@@ -9,7 +9,7 @@ import {
 } from "./extract-png-from-fcstd.js";
 import { loadIgnoreConfig, filterIgnoredFiles } from "./ignore-utils.js";
 import { runFreeCADIsometricFit } from "./fit-utils.js";
-import { readFileSync } from "fs";
+import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -56,10 +56,21 @@ async function processAllFiles(runFit = false, ignoreConfig = null) {
     let failureCount = 0;
 
     for (const file of fcstdFiles) {
+      let fileToProcess = file;
+      let tempFile = null;
+
       try {
         // If --fit flag is set, run FreeCAD with isometric-fit macro first
         if (runFit) {
-          await runFreeCADIsometricFit(file);
+          const ext = path.extname(file);
+          const dir = path.dirname(file);
+          const baseName = path.basename(file, ext);
+          tempFile = path.join(dir, `${baseName}_temp_${Date.now()}${ext}`);
+
+          fs.copyFileSync(file, tempFile);
+          fileToProcess = tempFile;
+
+          await runFreeCADIsometricFit(fileToProcess);
         }
 
         // Prepare output path - same directory, same name but with .png extension
@@ -68,11 +79,20 @@ async function processAllFiles(runFit = false, ignoreConfig = null) {
         const pngPath = path.join(dir, `${baseName}-preview.png`);
 
         // Try to extract thumbnail from the file
-        await extractThumbnailFromFCStd(file, pngPath);
+        await extractThumbnailFromFCStd(fileToProcess, pngPath);
         successCount++;
       } catch (err) {
         console.log(`❌ Error processing ${file}: ${err.message}`);
         failureCount++;
+      } finally {
+        // Clean up temp file
+        if (tempFile && fs.existsSync(tempFile)) {
+          try {
+            fs.unlinkSync(tempFile);
+          } catch (e) {
+            console.log(`⚠️ Could not delete temp file ${tempFile}: ${e.message}`);
+          }
+        }
       }
       processedCount++;
       console.log(`📊 Progress: ${processedCount}/${fcstdFiles.length} (${successCount} succeeded, ${failureCount} failed)`);
@@ -97,7 +117,7 @@ async function main() {
 
   // Check for --version or --help flags
   if (args.includes("--version") || args.includes("-v")) {
-    const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
+    const pkg = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url)));
     console.log(pkg.version);
     process.exit(0);
   }
@@ -162,15 +182,43 @@ Examples:
   } else {
     // Process specific file(s)
     const file = fileArgs[0];
+    let fileToProcess = file;
+    let tempFile = null;
+    let customOutputPath = null;
 
-    // For single file mode, ignore config is not applied
-    if (runFit) {
-      console.log(`🔧 Running FreeCAD isometric-fit on: ${file}`);
-      await runFreeCADIsometricFit(file);
+    try {
+      // For single file mode, ignore config is not applied
+      if (runFit) {
+        const ext = path.extname(file);
+        const dir = path.dirname(file);
+        const baseName = path.basename(file, ext);
+        tempFile = path.join(dir, `${baseName}_temp_${Date.now()}${ext}`);
+
+        fs.copyFileSync(file, tempFile);
+        fileToProcess = tempFile;
+        
+        // Set output path based on original file
+        customOutputPath = path.join(dir, `${baseName}-preview.png`);
+
+        console.log(`🔧 Running FreeCAD isometric-fit on temp file: ${path.basename(tempFile)}`);
+        await runFreeCADIsometricFit(fileToProcess);
+      }
+
+      console.log(`🔍 Extracting image from: ${fileToProcess}`);
+      await processSingleFile(fileToProcess, customOutputPath);
+    } catch (err) {
+      console.error(`❌ Error processing ${file}:`, err);
+      process.exitCode = 1;
+    } finally {
+      // Clean up temp file
+      if (tempFile && fs.existsSync(tempFile)) {
+        try {
+          fs.unlinkSync(tempFile);
+        } catch (e) {
+          console.warn(`⚠️ Failed to delete temp file: ${e.message}`);
+        }
+      }
     }
-
-    console.log(`🔍 Extracting image from: ${file}`);
-    await processSingleFile(file);
   }
 }
 
