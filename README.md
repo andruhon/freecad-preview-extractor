@@ -48,7 +48,7 @@ fcxtc filename.FCStd
 
 ### Generate preview with FreeCAD before extraction (requires FreeCAD and desktop environment)
 
-Adding `--fit` argument will trigger `src/isofit.FCMacro` FreeCAD macros for each file,
+Adding `--fit` argument will trigger `src/isometric-fit.FCMacro` FreeCAD macros for each file,
 the macros sets model to the isometric view, does "fit into view", and saves the file.
 
 ```bash
@@ -80,7 +80,7 @@ test-model.FCStd
 
 The `--fit` option will:
 1. Open each FreeCAD file with FreeCAD
-2. Run the `isofit.FCMacro` macro to set Isometric View and Fit All
+2. Run the `isometric-fit.FCMacro` macro to set Isometric View and Fit All
 3. Save the file with the updated preview
 4. Extract the preview image as usual
 
@@ -152,7 +152,7 @@ Key files of the project (not including all files):
 
 - `src/index.js` - Main CLI entry point
 - `src/extract-png-from-fcstd.js` - Thumbnail extraction logic
-- `src/isofit.FCMacro` - FreeCAD macro for isometric view and fit (used by `--fit` option)
+- `src/isometric-fit.FCMacro` - FreeCAD macro for isometric view and fit (used by `--fit` option)
 - `tests/` - Unit tests for ignore functionality
 
 ## License

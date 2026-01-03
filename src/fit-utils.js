@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Run FreeCAD with isometric fit macro to generate preview
 async function runFreeCADIsometricFit(fcstdFile) {
-  const macroPath = path.join(__dirname, "isofit.FCMacro");
+  const macroPath = path.join(__dirname, "isometric-fit.FCMacro");
 
   return new Promise((resolve, reject) => {
     console.log(

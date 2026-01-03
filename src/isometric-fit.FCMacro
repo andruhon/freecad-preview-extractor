@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Macro Begin: isofit.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
+# Macro Begin: isometric-fit.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
 import FreeCAD
 
 try:
@@ -12,7 +12,7 @@ try:
     Gui.SendMsgToActiveView("Save")
     Gui.getMainWindow().close()
 except Exception as e:
-    print("Error in isofit macro: {}".format(e))
+    print("Error in isometric-fit macro: {}".format(e))
     Gui.getMainWindow().close()
 
-# Macro End: isofit.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++
+# Macro End: isometric-fit.FCMacro +++++++++++++++++++++++++++++++++++++++++++++++++

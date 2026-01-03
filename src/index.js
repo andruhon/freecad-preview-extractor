@@ -57,7 +57,7 @@ async function processAllFiles(runFit = false, ignoreConfig = null) {
 
     for (const file of fcstdFiles) {
       try {
-        // If --fit flag is set, run FreeCAD with isofit macro first
+        // If --fit flag is set, run FreeCAD with isometric-fit macro first
         if (runFit) {
           await runFreeCADIsometricFit(file);
         }
@@ -145,7 +145,7 @@ Examples:
     // No arguments - process all files
     if (runFit) {
       console.log(
-        "🔍 Running FreeCAD isofit and extracting images from all FreeCAD files in current directory...",
+        "🔍 Running FreeCAD isometric-fit and extracting images from all FreeCAD files in current directory...",
       );
     } else {
       console.log(
@@ -165,7 +165,7 @@ Examples:
 
     // For single file mode, ignore config is not applied
     if (runFit) {
-      console.log(`🔧 Running FreeCAD isofit on: ${file}`);
+      console.log(`🔧 Running FreeCAD isometric-fit on: ${file}`);
       await runFreeCADIsometricFit(file);
     }
 
