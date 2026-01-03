@@ -8,6 +8,7 @@ import {
   extractThumbnailFromFCStd,
 } from "./extract-png-from-fcstd.js";
 import { loadIgnoreConfig, filterIgnoredFiles } from "./ignore-utils.js";
+import { runFreeCADIsofit } from "./fit-utils.js";
 import { readFileSync } from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -15,46 +16,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Get root directory for pattern matching
 function getRootDir(cwd = process.cwd()) {
   return cwd;
-}
-
-// Run FreeCAD with isofit macro to generate preview
-async function runFreeCADIsofit(fcstdFile) {
-  const macroPath = path.join(__dirname, "isofit.FCMacro");
-
-  return new Promise((resolve, reject) => {
-    console.log(
-      `🔧 Running FreeCAD with Isometric, Fit All macro on ${fcstdFile}...`,
-    );
-
-    const freecad = spawn("freecad", [fcstdFile, macroPath]);
-
-    freecad.stdout.on("data", (data) => {
-      // Log FreeCAD output if needed for debugging
-      // console.log(`FreeCAD: ${data}`);
-    });
-
-    freecad.stderr.on("data", (data) => {
-      // Log errors but don't fail immediately
-      // console.error(`FreeCAD stderr: ${data}`);
-    });
-
-    freecad.on("close", (code) => {
-      if (code === 0) {
-        console.log(`✅ FreeCAD processing complete for ${fcstdFile}`);
-        resolve();
-      } else {
-        reject(new Error(`FreeCAD exited with code ${code}`));
-      }
-    });
-
-    freecad.on("error", (err) => {
-      reject(
-        new Error(
-          `Failed to start FreeCAD: ${err.message}. Make sure FreeCAD is installed and available in PATH.`,
-        ),
-      );
-    });
-  });
 }
 
 // Process all .FCStd files in current directory and subdirectories
@@ -213,7 +174,7 @@ Examples:
   }
 }
 
-export { processAllFiles, runFreeCADIsofit };
+export { processAllFiles };
 export { loadIgnoreConfig, filterIgnoredFiles } from "./ignore-utils.js";
 
 // Run the script
