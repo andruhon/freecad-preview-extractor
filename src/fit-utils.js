@@ -4,8 +4,8 @@ import { spawn } from "child_process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Run FreeCAD with isofit macro to generate preview
-async function runFreeCADIsofit(fcstdFile) {
+// Run FreeCAD with isometric fit macro to generate preview
+async function runFreeCADIsometricFit(fcstdFile) {
   const macroPath = path.join(__dirname, "isofit.FCMacro");
 
   return new Promise((resolve, reject) => {
@@ -44,4 +44,4 @@ async function runFreeCADIsofit(fcstdFile) {
   });
 }
 
-export { runFreeCADIsofit };
+export { runFreeCADIsometricFit };

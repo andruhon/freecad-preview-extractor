@@ -8,7 +8,7 @@ import {
   extractThumbnailFromFCStd,
 } from "./extract-png-from-fcstd.js";
 import { loadIgnoreConfig, filterIgnoredFiles } from "./ignore-utils.js";
-import { runFreeCADIsofit } from "./fit-utils.js";
+import { runFreeCADIsometricFit } from "./fit-utils.js";
 import { readFileSync } from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -59,7 +59,7 @@ async function processAllFiles(runFit = false, ignoreConfig = null) {
       try {
         // If --fit flag is set, run FreeCAD with isofit macro first
         if (runFit) {
-          await runFreeCADIsofit(file);
+          await runFreeCADIsometricFit(file);
         }
 
         // Prepare output path - same directory, same name but with .png extension
@@ -166,7 +166,7 @@ Examples:
     // For single file mode, ignore config is not applied
     if (runFit) {
       console.log(`🔧 Running FreeCAD isofit on: ${file}`);
-      await runFreeCADIsofit(file);
+      await runFreeCADIsometricFit(file);
     }
 
     console.log(`🔍 Extracting image from: ${file}`);
